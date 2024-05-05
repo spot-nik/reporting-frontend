@@ -19,7 +19,7 @@ import {useState} from "react";
 export default function ReportingEditor({initialValue, disabled, onChange, containerSelector}) {
     const [editorElement, setEditorElement] = useState(null);
     const parser = new DOMParser();
-    const initialDom = parser.parseFromString(initialValue, "text/html");
+    const initialDom = parser.parseFromString(initialValue || "<div></div>", "text/html");
 
     function onRef(_editorElement) {
         setEditorElement(_editorElement);

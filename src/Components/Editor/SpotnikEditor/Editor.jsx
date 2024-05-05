@@ -11,7 +11,6 @@ import {LinkNode} from "@lexical/link";
 import {ImageNode} from "./Nodes/ImageNode.jsx";
 import {ExtendedListItemNode} from "./Nodes/ExtendedListItemNode.jsx";
 import {ExtendedListNode} from "./Nodes/ExtendedListNode.jsx";
-import DivParagraphNode from "./Nodes/DivParagraphNode.jsx";
 import {InsightNode} from "../../InsightBuilder/InsightNode.jsx";
 import {Flex} from "monday-ui-react-core";
 
@@ -31,8 +30,7 @@ export default function SpotnikEditor({initialDom, innerEditor, toolbarPlugins, 
         },
         theme: lexicalTheme,
         nodes: [
-            DivParagraphNode,
-            {replace: ParagraphNode, with: () => new DivParagraphNode()},
+            ParagraphNode,
             ExtendedTextNode,
             {replace: TextNode, with: (node) => new ExtendedTextNode(node.__text)},
             HeadingNode,
