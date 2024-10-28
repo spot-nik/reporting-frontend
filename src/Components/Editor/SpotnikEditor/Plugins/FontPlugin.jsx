@@ -57,7 +57,6 @@ export default function FontsPlugin({containerSelector}) {
                                    onChange={setSearch}/>
                            <List className="toolbar-list" style={{width: 200}}>
                                {filteredFonts.map(font => (<ListItem key={font}
-                                                                     className="toolbar-list-item"
                                                                      onClick={() => handleClick(font)}
                                                                      selected={font === selectedFont}>
                                    <Text type={Text.types.TEXT2} ellipsis={true}

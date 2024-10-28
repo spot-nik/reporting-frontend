@@ -12,10 +12,6 @@
     max-height: 150px;
 }
 
-.toolbar-list-item {
-    height: auto !important;
-}
-
 .upload-image-tab-panel {
     text-align: center;
 }

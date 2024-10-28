@@ -34,14 +34,17 @@ export default function Management() {
         <CardGroup title="Usage" cards={[
             <Card key="integration-insights-count" title="Integration Insights"
                   description={subscription?.is_default ? "last 30 days" : `since ${subscriptionDate?.format("DD MMM, YYYY")}`}
-                  value={accountInsightsUsage?.total_insights-accountInsightsUsage?.report_insights}
+                  info={"# of integrations triggered from \"Reporting - Summary\" and \"Reporting - Export\" integrations"}
+                  value={accountInsightsUsage?.total_insights - accountInsightsUsage?.report_insights}
                   isLoading={isLoadingAccountInsightsUsage || isLoadingSubscriptionDate}/>,
             <Card key="report-insights-count" title="Email Insights"
                   description={subscription?.is_default ? "last 30 days" : `since ${subscriptionDate?.format("DD MMM, YYYY")}`}
+                  info="The count of insights in all account email reports sent"
                   value={accountInsightsUsage?.report_insights}
                   isLoading={isLoadingAccountInsightsUsage || isLoadingSubscriptionDate}/>,
             <Card key="account-insights-count" title="Total Insights"
                   description={subscription?.is_default ? "last 30 days" : `since ${subscriptionDate?.format("DD MMM, YYYY")}`}
+                  info="A total of both reporting integrations and email insights (this is the number that applies for packages pricing)"
                   value={`${accountInsightsUsage?.total_insights}/${limit}`}
                   prefix={`${Math.round((accountInsightsUsage?.total_insights / limit) * 100)}%`}
                   isLoading={isLoadingAccountInsightsUsage || isLoadingSubscriptionDate}/>,

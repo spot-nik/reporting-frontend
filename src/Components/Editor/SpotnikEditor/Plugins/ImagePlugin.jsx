@@ -1,10 +1,8 @@
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {Upload} from "antd";
 import {useState} from "react";
-import {$createRangeSelection, $getSelection, $insertNodes} from "lexical";
+import {$insertNodes} from "lexical";
 import {$createImageNode} from "../Nodes/ImageNode.jsx";
-import {getClosestElementNode} from "./KeyboardPlugin";
-import {$createDivParagraphNode} from "../Nodes/DivParagraphNode.jsx";
 import {v4 as uuid} from "uuid";
 import {
     Dialog,
@@ -94,18 +92,8 @@ export default function ImagePlugin({containerSelector}) {
 
     function insertImage() {
         editor.update(() => {
-            let selection;
-            selection = $getSelection();
-            if (selection === null) {
-                selection = $createRangeSelection();
-            }
-            const hasElementNode = selection.getNodes().map(getClosestElementNode).some((node) => node);
-            const nodesToInsert = [];
-            if (!hasElementNode) {
-                nodesToInsert.push($createDivParagraphNode());
-            }
-            nodesToInsert.push($createImageNode(data));
-            $insertNodes(nodesToInsert);
+            const imageNode = $createImageNode(data)
+            $insertNodes([imageNode]);
         });
         handleCancel();
     }

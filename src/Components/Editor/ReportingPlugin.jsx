@@ -25,7 +25,7 @@ export default function ReportingPlugin({onRef, onChange}) {
     }
 
     return [<RichTextPlugin key="rich-text"
-                            contentEditable={<div ref={onRef} style={{width: "100%", flexGrow: 1}}>
+                            contentEditable={<div ref={onRef} style={{width: "100%", flexGrow: 1, padding: "8px 0"}}>
                                 <ContentEditable style={{
                                     width: "100%",
                                     height: "100%",

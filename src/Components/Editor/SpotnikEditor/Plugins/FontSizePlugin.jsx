@@ -50,7 +50,6 @@ export default function FontSizePlugin({containerSelector}) {
                    content={() => <DialogContentContainer>
                        <List className="toolbar-list">
                            {FONT_SIZE_OPTIONS.map(fontSize => (<ListItem key={fontSize}
-                                                                         className="toolbar-list-item"
                                                                          onClick={() => handleClick(fontSize)}
                                                                          selected={fontSize === selectedFontSize}>
                                <Text type={Text.types.TEXT2} ellipsis={true}

@@ -4,3 +4,15 @@
     width: 100%;
     height: 100%;
 }
+
+.editor-paragraph {
+    margin: 0;
+}
+
+.editor-list-ul, .editor-list-ol {
+    margin: 0;
+}
+
+.editor-nested-listitem {
+    list-style-type: none;
+}

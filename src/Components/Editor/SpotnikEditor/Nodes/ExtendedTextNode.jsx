@@ -1,25 +1,26 @@
-import {$isTextNode, TextNode} from "lexical";
-
-
-export function cleanWhiteSpace(element) {
-    element.style.whiteSpace = null;
-    for (const child of element.children) {
-        cleanWhiteSpace(child);
-    }
-}
+import {
+    $isTextNode,
+    TextNode,
+} from 'lexical';
 
 function patchStyleConversion(originalDOMConverter) {
     return (node) => {
         const original = originalDOMConverter?.(node);
-        if (!original) return null;
-
+        if (!original) {
+            return null;
+        }
         const originalOutput = original.conversion(node);
-        if (!originalOutput) return originalOutput
+
+        if (!originalOutput) {
+            return originalOutput;
+        }
 
         const backgroundColor = node.style.backgroundColor;
         const color = node.style.color;
         const fontFamily = node.style.fontFamily;
+        const fontWeight = node.style.fontWeight;
         const fontSize = node.style.fontSize;
+        const textDecoration = node.style.textDecoration;
 
         return {
             ...originalOutput,
@@ -31,10 +32,12 @@ function patchStyleConversion(originalDOMConverter) {
                         backgroundColor ? `background-color: ${backgroundColor}` : null,
                         color ? `color: ${color}` : null,
                         fontFamily ? `font-family: ${fontFamily}` : null,
-                        fontSize ? `font-size: ${fontSize}` : null
+                        fontWeight ? `font-weight: ${fontWeight}` : null,
+                        fontSize ? `font-size: ${fontSize}` : null,
+                        textDecoration ? `text-decoration: ${textDecoration}` : null,
                     ]
                         .filter((value) => value != null)
-                        .join("; ");
+                        .join('; ');
                     if (style.length) {
                         return result.setStyle(style);
                     }
@@ -46,8 +49,12 @@ function patchStyleConversion(originalDOMConverter) {
 }
 
 export class ExtendedTextNode extends TextNode {
+    constructor(text, key) {
+        super(text, key);
+    }
+
     static getType() {
-        return "extended-text";
+        return 'extended-text';
     }
 
     static clone(node) {
@@ -60,7 +67,7 @@ export class ExtendedTextNode extends TextNode {
             ...importers,
             code: () => ({
                 conversion: patchStyleConversion(importers?.code),
-                priority: 1,
+                priority: 1
             }),
             em: () => ({
                 conversion: patchStyleConversion(importers?.em),
@@ -81,23 +88,34 @@ export class ExtendedTextNode extends TextNode {
             sup: () => ({
                 conversion: patchStyleConversion(importers?.sup),
                 priority: 1
-            })
-        }
+            }),
+        };
     }
 
     static importJSON(serializedNode) {
         return TextNode.importJSON(serializedNode);
     }
 
-    exportJSON() {
-        const serialized = super.exportJSON();
-        serialized.type = ExtendedTextNode.getType();
-        return serialized;
+    isSimpleText() {
+        return (
+            (this.__type === 'text' || this.__type === 'extended-text') &&
+            this.__mode === 0
+        );
     }
 
-    exportDOM(editor) {
-        const {element} = super.exportDOM(editor);
-        cleanWhiteSpace(element);
-        return {element};
+    exportJSON() {
+        return {
+            ...super.exportJSON(),
+            type: 'extended-text',
+            version: 1,
+        }
     }
+}
+
+export function $createExtendedTextNode(text) {
+    return new ExtendedTextNode(text);
+}
+
+export function $isExtendedTextNode(node) {
+    return node instanceof ExtendedTextNode;
 }

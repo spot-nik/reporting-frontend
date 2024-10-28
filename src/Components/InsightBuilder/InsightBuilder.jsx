@@ -16,8 +16,6 @@ import Steps from "./Modal/Steps.jsx";
 import MainContent from "./Modal/MainContent.jsx";
 import Footer from "./Modal/Footer.jsx";
 import {$createRangeSelection, $getSelection, $insertNodes} from "lexical";
-import {getClosestElementNode} from "../Editor/SpotnikEditor/Plugins/KeyboardPlugin.js";
-import {$createDivParagraphNode} from "../Editor/SpotnikEditor/Nodes/DivParagraphNode.jsx";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {$createInsightNode, $isInsightNode} from "./InsightNode.jsx";
 import {NavigationChevronLeft, NavigationChevronRight, Check, CloseSmall} from "monday-ui-react-core/icons";
@@ -188,13 +186,7 @@ export default function InsightBuilder({editorElement}) {
                 if (selection.getNodes().length === 1 && $isInsightNode(selection.getNodes()[0])) {
                     selection.getNodes()[0].insertAfter(newInsightNode);
                 } else {
-                    const hasElementNode = selection.getNodes().map(getClosestElementNode).some((node) => node);
-                    const nodesToInsert = [];
-                    if (!hasElementNode) {
-                        nodesToInsert.push($createDivParagraphNode());
-                    }
-                    nodesToInsert.push(newInsightNode);
-                    $insertNodes(nodesToInsert);
+                    $insertNodes([newInsightNode]);
                 }
             }
         })

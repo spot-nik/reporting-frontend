@@ -8,7 +8,7 @@ import {getMe} from "./Queries/monday.js";
 import {
     checkMondayApiValidation,
     createUser,
-    getSubscription,
+    getSubscription, getSubscriptionDate,
     installApp,
     updateUserInformation
 } from "./Queries/management.js";
@@ -16,6 +16,8 @@ import {AlertBanner, AlertBannerButton, AlertBannerText, IconButton} from "monda
 import {Upgrade, Help, Forum} from "monday-ui-react-core/icons";
 import TabsIndex from "./Components/Configuration/TabsIndex.jsx";
 import "./VibeBug.css";
+import {useQuery} from "@tanstack/react-query";
+import {getInsightsUsage} from "./Queries/reporting.js";
 
 const monday = mondaySdk();
 monday.setApiVersion(import.meta.env.VITE_MONDAY_API_VERSION);
@@ -25,6 +27,25 @@ function Reporting() {
     const [result, setResult] = useState();
     const [context, setContext] = useState({});
     const subscription = JSON.parse(sessionStorage.getItem(STORAGE_SUBSCRIPTION_KEY));
+
+    const {
+        data: subscriptionDate
+    } = useQuery({
+        queryKey: ["subscription_date"],
+        queryFn: getSubscriptionDate
+    });
+
+    const {
+        data: accountInsightsUsage
+    } = useQuery({
+        queryKey: ["account_usage"],
+        queryFn: () => getInsightsUsage({since: subscriptionDate}),
+        enabled: !!subscriptionDate
+    });
+
+    function planUsage() {
+        if (accountInsightsUsage && subscription) return Math.min(Math.round(accountInsightsUsage?.total_insights / subscription?.configuration?.monthlyIntegrationLimit * 100, 100));
+    }
 
     useEffect(() => {
         if (import.meta.env.VITE_BOARD_ID && import.meta.env.VITE_VIEW_ID) {
@@ -190,7 +211,23 @@ function Reporting() {
 
     return (
         <div>
-            {subscription.is_default &&
+            {planUsage() >= 90 ?
+                <div style={{
+                    textAlign: "center",
+                    lineHeight: "40px",
+                    backgroundColor: "#333",
+                    color: "white",
+                    fontSize: "18px"
+                }}>
+                    <AlertBanner isCloseHidden={true}
+                                 backgroundColor={planUsage() >= 100 ? AlertBanner.backgroundColors.NEGATIVE : AlertBanner.backgroundColors.WARNING}>
+                        <AlertBannerText text={`You have used ${planUsage()}% of Insights app plan`}/>
+                        <AlertBannerButton leftIcon={Upgrade}
+                                           onClick={() => {
+                                               monday.execute('openPlanSelection');
+                                           }}>Upgrade plan</AlertBannerButton>
+                    </AlertBanner>
+                </div> : subscription.is_default &&
                 <div style={{
                     textAlign: "center",
                     lineHeight: "40px",
@@ -206,7 +243,8 @@ function Reporting() {
                                                monday.execute('openPlanSelection');
                                            }}>Change plan</AlertBannerButton>
                     </AlertBanner>
-                </div>}
+                </div>
+            }
             <TabsIndex/>
             <div id="floating-icon-container" className="horizontal-space">
                 <IconButton icon={Forum} className="floating-icon"

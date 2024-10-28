@@ -5,7 +5,8 @@ import {
     EditableText,
     Divider,
     Flex,
-    Text
+    Text,
+    Label
 } from "monday-ui-react-core";
 import Owner from "./Owner.jsx";
 import {DeleteReport, DuplicateReport, TakeOwnership} from "./ReportActionButtons.jsx";
@@ -42,13 +43,30 @@ export default function ReportHeader({reportId, setReport}) {
         return <Text key="Insight count" type={Text.types.TEXT2}>Insights count: {insightsCount}</Text>;
     }
 
+    function ReportLabel() {
+        if (!report.sender || !report.to || report.to.length === 0) {
+            if (!report.sender && report.to && report.to.length !== 0) {
+                return <Label isAnimationDisabled={true} text="Missing sender" color={Label.colors.NEGATIVE}/>
+            }
+            if (report.sender && !report.to && report.to.length === 0) {
+                return <Label isAnimationDisabled={true} text="Missing recipient" color={Label.colors.NEGATIVE}/>
+            }
+            return <Label isAnimationDisabled={true} text="Missing sender and recipient" color={Label.colors.NEGATIVE}/>
+        }
+        if (report.name === "New report")
+            return <Label isAnimationDisabled={true} text="Don't forget to set a name to your report"/>
+    }
+
     return <Flex justify={Flex.justify.SPACE_BETWEEN} style={{width: "100%"}}>
-        <EditableText type={EditableText.types.TEXT1}
-                      readOnly={!editable}
-                      placeholder="New report"
-                      value={report.name || ""}
-                      onChange={(value) => setReport("name", value)}
-                      onClick={(e) => e.stopPropagation()}/>
+        <Flex gap={Flex.gaps.SMALL}>
+            <EditableText type={EditableText.types.TEXT1}
+                          readOnly={!editable}
+                          placeholder="New report"
+                          value={report.name || ""}
+                          onChange={(value) => setReport("name", value)}
+                          onClick={(e) => e.stopPropagation()}/>
+            <ReportLabel/>
+        </Flex>
         <Flex gap={Flex.gaps.XS}>
             {generateMenu()}
         </Flex>

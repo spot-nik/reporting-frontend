@@ -167,7 +167,6 @@ export default function BlockPlugin({containerSelector}) {
                 content={() => <DialogContentContainer>
                     <List className="toolbar-list">
                         {SUPPORTED_BLOCK_TYPES.map(block => (<ListItem key={block.key}
-                                                                       className="toolbar-list-item"
                                                                        onClick={() => changeBlock(block)}
                                                                        selected={block.key === selectedBlockType.key}>
                                 <Flex gap={Flex.gaps.SMALL}>
