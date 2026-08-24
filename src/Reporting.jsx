@@ -5,6 +5,7 @@ import {STORAGE_MONDAY_CONTEXT_KEY, STORAGE_SUBSCRIPTION_KEY} from "./consts.js"
 import Loader from "./Components/Loader/Loader.jsx";
 import ResultPage from "./Components/ResultPage.jsx";
 import {getMe} from "./Queries/monday.js";
+import {redirectToAuthorization as startAuthorizationRedirect} from "./auth.js";
 import {
     checkMondayApiValidation,
     createUser,
@@ -65,12 +66,15 @@ function Reporting() {
         }
     }, []);
 
-    function redirectToAuthorization({slug, userId}) {
-        const state = JSON.stringify({
-            user_id: userId,
-            app_id: import.meta.env.VITE_MONDAY_APP_ID
-        });
-        window.location.replace(`https://${slug}.monday.com/oauth2/authorize?client_id=${import.meta.env.VITE_CLIENT_ID}&state=${state}`);
+    async function redirectToAuthorization() {
+        try {
+            await startAuthorizationRedirect();
+        } catch (error) {
+            setResult({
+                status: "error",
+                title: "Couldn't redirect to authorization"
+            });
+        }
     }
 
     async function handleNewUser(user) {
@@ -82,7 +86,7 @@ function Reporting() {
                 userName: user.name,
                 userEmail: user.email
             })
-            redirectToAuthorization({slug: user.account.slug, userId: user.id});
+            await redirectToAuthorization();
         } catch (error) {
             setResult({
                 status: "error",
@@ -96,7 +100,7 @@ function Reporting() {
         try {
             const isValid = await checkMondayApiValidation();
             if (isValid) return true;
-            redirectToAuthorization({slug: user.account.slug, userId: user.id});
+            await redirectToAuthorization();
             return false;
         } catch (error) {
             if (error.error_code === "USER_NOT_FOUND") {
@@ -109,11 +113,11 @@ function Reporting() {
                     userName: user.name,
                     userEmail: user.email
                 });
-                redirectToAuthorization({slug: user.account.slug, userId: user.id});
+                await redirectToAuthorization();
                 return false;
             }
             if (error.error_code === "MONDAY_API_KEY_NOT_VALID") {
-                redirectToAuthorization({slug: user.account.slug, userId: user.id});
+                await redirectToAuthorization();
                 return false;
             }
             setResult({
